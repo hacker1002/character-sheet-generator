@@ -1,0 +1,257 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+main {
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Form styles */
+.character-form h1 {
+  margin-bottom: 10px;
+  font-size: 32px;
+  color: #222;
+}
+
+.character-form .subtitle {
+  margin-bottom: 30px;
+  color: #666;
+  font-size: 16px;
+}
+
+.form-field {
+  margin-bottom: 24px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #444;
+  font-size: 15px;
+}
+
+.required {
+  color: #e74c3c;
+}
+
+.form-field input[type='text'],
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-field input[type='text']:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.form-field input[type='file'] {
+  display: block;
+  margin-bottom: 10px;
+  padding: 8px;
+  font-size: 15px;
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 200px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.error {
+  display: block;
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.hint {
+  display: block;
+  color: #999;
+  font-size: 13px;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.preview {
+  margin-top: 16px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  background: #fafafa;
+}
+
+.preview img {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 6px;
+}
+
+button[type='submit'], .reset-button {
+  width: 100%;
+  padding: 16px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button[type='submit']:hover:not(:disabled), .reset-button:hover {
+  background: #2980b9;
+}
+
+button[type='submit']:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+}
+
+/* Loading state */
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.loading-hint {
+  font-size: 14px;
+  color: #999;
+}
+
+/* Result display */
+.result-display {
+  text-align: center;
+}
+
+.result-display h2 {
+  margin-bottom: 24px;
+  font-size: 28px;
+  color: #222;
+}
+
+.result-image {
+  margin-bottom: 24px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.result-image img {
+  max-width: 100%;
+  display: block;
+}
+
+.result-metadata {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.result-metadata p {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.result-metadata p:last-child {
+  margin-bottom: 0;
+}
+
+.result-metadata strong {
+  color: #333;
+}
+
+.reset-button {
+  background: #2ecc71;
+}
+
+.reset-button:hover {
+  background: #27ae60;
+}
+
+/* Error message */
+.error-message {
+  background: #ffe6e6;
+  border: 2px solid #e74c3c;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  color: #c0392b;
+}
+
+.error-message strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  body {
+    padding: 10px;
+  }
+
+  main {
+    padding: 24px;
+  }
+
+  .character-form h1 {
+    font-size: 26px;
+  }
+
+  .form-field textarea {
+    min-height: 150px;
+  }
+}
