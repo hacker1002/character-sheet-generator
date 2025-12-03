@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CharacterForm } from './components/character-form';
 import { ResultDisplay } from './components/result-display';
 import { LoadingState } from './components/loading-state';
@@ -62,36 +62,55 @@ export default function HomePage() {
     }
   };
 
-  const handleReset = () => {
-    setResult(null);
-    setError(null);
-  };
+  // Auto-scroll to result when generation completes
+  useEffect(() => {
+    if (result) {
+      setTimeout(() => {
+        document.querySelector('.result-section')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 100);
+    }
+  }, [result]);
 
   return (
-    <main>
-      {/* Show form if no result */}
-      {!result && !isLoading && (
-        <>
+    <main className="page-container">
+      {/* Page Header - Above Both Columns */}
+      <header className="page-header">
+        <h1>Character Sheet Generator</h1>
+        <p className="subtitle">
+          Upload an avatar image and generate an 8-panel character sheet using AI
+        </p>
+      </header>
+
+      <div className="main-grid">
+        {/* Left Column - Form */}
+        <section className="form-section">
           <CharacterForm onSubmit={handleSubmit} isLoading={isLoading} />
           {error && (
             <div className="error-message">
               <strong>Error:</strong> {error}
             </div>
           )}
-        </>
-      )}
+        </section>
 
-      {/* Show loading state */}
-      {isLoading && <LoadingState />}
-
-      {/* Show result */}
-      {result && result.imageUrl && (
-        <ResultDisplay
-          imageUrl={result.imageUrl}
-          metadata={result.metadata}
-          onReset={handleReset}
-        />
-      )}
+        {/* Right Column - Result */}
+        <section className="result-section">
+          {isLoading && <LoadingState />}
+          {result && result.imageUrl && (
+            <ResultDisplay
+              imageUrl={result.imageUrl}
+              metadata={result.metadata}
+            />
+          )}
+          {!isLoading && !result && (
+            <div className="result-placeholder">
+              <p>Generated character sheet will appear here</p>
+            </div>
+          )}
+        </section>
+      </div>
     </main>
   );
 }

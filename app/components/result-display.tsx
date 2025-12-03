@@ -7,18 +7,13 @@ interface ResultDisplayProps {
     model: string;
     generatedAt: string;
   };
-  onReset?: () => void;
 }
 
 /**
  * Display component for generated character sheet
- * Shows image and metadata, with option to generate another
+ * Shows image and metadata
  */
-export function ResultDisplay({
-  imageUrl,
-  metadata,
-  onReset,
-}: ResultDisplayProps) {
+export function ResultDisplay({ imageUrl, metadata }: ResultDisplayProps) {
   return (
     <div className="result-display">
       <h2>Generated Character Sheet</h2>
@@ -40,12 +35,6 @@ export function ResultDisplay({
             {new Date(metadata.generatedAt).toLocaleString()}
           </p>
         </div>
-      )}
-
-      {onReset && (
-        <button onClick={onReset} className="reset-button">
-          Generate Another
-        </button>
       )}
     </div>
   );

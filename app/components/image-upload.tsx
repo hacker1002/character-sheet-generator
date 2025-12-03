@@ -63,11 +63,21 @@ export function ImageUpload({ register, setValue, errors, onChange }: ImageUploa
         onChange={handleFileChange}
       />
       {errors.avatar && <span className="error">{errors.avatar.message}</span>}
-      {preview && (
-        <div className="preview">
-          <img src={preview} alt="Avatar preview" />
-        </div>
-      )}
+
+      {/* Fixed Preview Container - Prevents Layout Shift */}
+      <div className="fixed-preview">
+        {preview ? (
+          <img
+            src={preview}
+            alt="Avatar preview"
+            className="preview-image"
+          />
+        ) : (
+          <div className="preview-placeholder">
+            <span className="placeholder-text">Image preview will appear here</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

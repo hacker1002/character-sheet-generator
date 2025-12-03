@@ -18,6 +18,7 @@ interface CharacterFormProps {
  * Simplified character sheet form with only 2 fields:
  * 1. Avatar image upload
  * 2. System prompt textarea
+ * Layout: Two-column grid on desktop, stacked on mobile
  */
 export function CharacterForm({ onSubmit, isLoading }: CharacterFormProps) {
   const {
@@ -34,23 +35,18 @@ export function CharacterForm({ onSubmit, isLoading }: CharacterFormProps) {
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="character-form">
-      <h1>Character Sheet Generator</h1>
-      <p className="subtitle">
-        Upload an avatar image and generate an 8-panel character sheet using AI
-      </p>
-
-      {/* Avatar Upload with Preview */}
+    <form onSubmit={handleSubmit(onSubmit)} className="form-container">
+      {/* Image Upload */}
       <ImageUpload register={register} setValue={setValue} errors={errors} />
 
-      {/* System Prompt Textarea */}
+      {/* System Prompt */}
       <div className="form-field">
         <label htmlFor="systemPrompt">
           System Prompt <span className="required">*</span>
         </label>
         <textarea
           id="systemPrompt"
-          rows={10}
+          rows={12}
           placeholder="Describe the character sheet style and layout..."
           {...register('systemPrompt')}
         />
