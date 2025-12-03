@@ -29,11 +29,11 @@ export default function HomePage() {
 
       const uploadData: UploadResponse = await uploadResponse.json();
 
-      if (!uploadData.success || !uploadData.uploadId) {
+      if (!uploadData.success || !uploadData.imageData) {
         throw new Error(uploadData.error || 'Image upload failed');
       }
 
-      // Step 2: Generate character sheet
+      // Step 2: Generate character sheet (pass base64 data)
       const generateResponse = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -41,7 +41,7 @@ export default function HomePage() {
         },
         body: JSON.stringify({
           systemPrompt: data.systemPrompt,
-          uploadId: uploadData.uploadId,
+          imageData: uploadData.imageData,
         }),
       });
 
@@ -98,9 +98,9 @@ export default function HomePage() {
         {/* Right Column - Result */}
         <section className="result-section">
           {isLoading && <LoadingState />}
-          {result && result.imageUrl && (
+          {result && result.imageData && (
             <ResultDisplay
-              imageUrl={result.imageUrl}
+              imageData={result.imageData}
               metadata={result.metadata}
             />
           )}

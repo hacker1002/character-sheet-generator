@@ -2,14 +2,15 @@
 
 export interface CharacterSheetRequest {
   systemPrompt: string;
-  uploadId: string;
+  uploadId?: string; // Legacy: for file-based uploads
+  imageData?: string; // Base64 image data (in-memory)
   provider?: string; // Optional: override default provider
 }
 
 export interface CharacterSheetResponse {
   success: boolean;
-  imageUrl?: string;
-  imageData?: string;
+  imageUrl?: string; // Legacy: URL to saved file
+  imageData?: string; // Base64 image data (in-memory)
   error?: string;
   metadata?: {
     provider: string;
@@ -21,8 +22,9 @@ export interface CharacterSheetResponse {
 
 export interface UploadResponse {
   success: boolean;
-  uploadId?: string;
-  previewUrl?: string;
+  uploadId?: string; // Legacy: for file-based uploads
+  imageData?: string; // Base64 compressed image (in-memory)
+  previewUrl?: string; // Data URL for preview
   error?: string;
   fileSize?: number;
 }

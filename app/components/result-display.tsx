@@ -1,7 +1,7 @@
 'use client';
 
 interface ResultDisplayProps {
-  imageUrl: string;
+  imageData: string; // Base64 image data
   metadata?: {
     provider: string;
     model: string;
@@ -11,9 +11,12 @@ interface ResultDisplayProps {
 
 /**
  * Display component for generated character sheet
- * Shows image and metadata
+ * Shows image and metadata (base64 in-memory)
  */
-export function ResultDisplay({ imageUrl, metadata }: ResultDisplayProps) {
+export function ResultDisplay({ imageData, metadata }: ResultDisplayProps) {
+  // Convert base64 to data URL for display
+  const imageUrl = `data:image/png;base64,${imageData}`;
+
   return (
     <div className="result-display">
       <h2>Generated Character Sheet</h2>

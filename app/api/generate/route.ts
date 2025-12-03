@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  loadFile,
-  base64ToBuffer,
-  saveUploadedFile,
-} from "@/lib/image-processor";
+import { base64ToBuffer } from "@/lib/image-processor";
 import { ProviderFactory } from "@/lib/providers/provider-factory";
 import { CharacterSheetRequest, CharacterSheetResponse } from "@/lib/types";
-import { join } from "path";
 
 export const runtime = "nodejs";
 export const maxDuration = 60; // Provider-dependent, can take longer
@@ -20,27 +15,21 @@ export async function POST(
 ): Promise<NextResponse<CharacterSheetResponse>> {
   try {
     const body: CharacterSheetRequest = await request.json();
-    const { systemPrompt, uploadId, provider: requestedProvider } = body;
+    const { systemPrompt, imageData, provider: requestedProvider } = body;
 
     // Validation: Required fields
-    if (!systemPrompt || !uploadId) {
+    if (!systemPrompt || !imageData) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required fields: systemPrompt, uploadId",
+          error: "Missing required fields: systemPrompt, imageData",
         },
         { status: 400 }
       );
     }
 
-    // Load uploaded image
-    const uploadPath = join(
-      process.cwd(),
-      "public",
-      "uploads",
-      `${uploadId}.webp`
-    );
-    const imageBuffer = await loadFile(uploadPath);
+    // Convert base64 to buffer (in-memory, Vercel-compatible)
+    const imageBuffer = base64ToBuffer(imageData);
 
     // Get provider instance (use requested or default)
     const provider = requestedProvider
@@ -77,14 +66,12 @@ export async function POST(
       );
     }
 
-    // Save generated image to public/uploads
-    const generatedBuffer = base64ToBuffer(result.images[0]);
-    const generatedFilename = `generated-${uploadId}-${result.provider}.png`;
-    await saveUploadedFile(generatedBuffer, generatedFilename);
+    // Return base64 image data (in-memory, Vercel-compatible)
+    const generatedImageData = result.images[0];
 
     return NextResponse.json({
       success: true,
-      imageUrl: `/uploads/${generatedFilename}`,
+      imageData: generatedImageData,
       metadata: {
         provider: result.provider,
         model: result.metadata.model,

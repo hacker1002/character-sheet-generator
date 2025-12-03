@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  compressImage,
-  saveUploadedFile,
-} from '@/lib/image-processor';
+import { compressImage } from '@/lib/image-processor';
 import { UploadResponse } from '@/lib/types';
 
 // Configure route for larger uploads
@@ -54,17 +51,17 @@ export async function POST(
     const buffer = Buffer.from(await file.arrayBuffer());
     const compressed = await compressImage(buffer, { quality: 85 });
 
-    // Save temporarily with unique ID
+    // Convert to base64 for in-memory storage (Vercel-compatible)
+    const base64 = compressed.toString('base64');
     const uploadId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const filename = `${uploadId}.webp`;
-    await saveUploadedFile(compressed, filename);
 
-    // Create preview URL
-    const previewUrl = `/uploads/${filename}`;
+    // Create data URL for preview
+    const previewUrl = `data:image/webp;base64,${base64}`;
 
     return NextResponse.json({
       success: true,
       uploadId,
+      imageData: base64,
       previewUrl,
       fileSize: compressed.length,
     });
