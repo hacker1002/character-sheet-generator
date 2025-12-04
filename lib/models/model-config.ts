@@ -13,24 +13,32 @@ export interface ModelConfig {
 
 /**
  * Default models for parallel generation
- * Currently supports two Gemini models:
+ * Currently supports three models:
  * - gemini-2.5-flash-image: Stable, fast generation
  * - gemini-3-pro-image-preview: Preview, advanced reasoning + text rendering
+ * - flux-schnell: Replicate AI, fast generation (50 free/month, then $0.003/img)
  */
 export const DEFAULT_MODELS: ModelConfig[] = [
   {
-    id: 'gemini-flash',
-    label: 'Gemini Flash',
-    provider: 'gemini',
-    model: 'gemini-2.5-flash-image',
+    id: "gemini-flash",
+    label: "Gemini Flash",
+    provider: "gemini",
+    model: "gemini-2.5-flash-image",
     preview: false,
   },
   {
-    id: 'gemini-pro',
-    label: 'Gemini Pro (Preview)',
-    provider: 'gemini',
-    model: 'gemini-3-pro-image-preview',
+    id: "gemini-pro",
+    label: "Gemini Pro (Preview)",
+    provider: "gemini",
+    model: "gemini-3-pro-image-preview",
     preview: true,
+  },
+  {
+    id: "flux-schnell",
+    label: "Flux Schnell",
+    provider: "flux",
+    model: "black-forest-labs/flux-schnell",
+    preview: false,
   },
 ];
 

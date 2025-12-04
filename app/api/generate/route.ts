@@ -38,25 +38,17 @@ export async function POST(
     const imageBuffer = base64ToBuffer(imageData);
 
     // Convert template base64 to buffer if provided
-    const templateBuffer = templateData ? base64ToBuffer(templateData) : undefined;
+    const templateBuffer = templateData
+      ? base64ToBuffer(templateData)
+      : undefined;
 
     // Get provider instance (use requested or default)
     let provider;
-    if (requestedProvider) {
-      provider = ProviderFactory.createProvider(requestedProvider as any, {
-        name: requestedProvider,
-        apiKey:
-          process.env[`${requestedProvider.toUpperCase()}_API_KEY`] || "",
-        defaultModel: requestedModel,
-      });
-    } else if (requestedModel) {
-      // For default provider with custom model, recreate with model parameter
-      const defaultType = (process.env.DEFAULT_PROVIDER || 'gemini') as any;
-      provider = ProviderFactory.createProvider(defaultType, {
-        name: defaultType,
-        apiKey: process.env[`${defaultType.toUpperCase()}_API_KEY`] || "",
-        defaultModel: requestedModel,
-      });
+    if (requestedProvider && requestedModel) {
+      provider = ProviderFactory.createProvider(
+        requestedProvider as any,
+        requestedModel
+      );
     } else {
       provider = ProviderFactory.getDefaultProvider();
     }

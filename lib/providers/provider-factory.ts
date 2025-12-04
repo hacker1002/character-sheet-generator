@@ -1,7 +1,14 @@
-import { BaseProvider, ProviderConfig } from './types';
-import { GeminiProvider } from './gemini-provider';
+import { BaseProvider, ProviderConfig } from "./types";
+import { GeminiProvider } from "./gemini-provider";
+import { FluxProvider } from "./flux-provider";
 
-type ProviderType = 'gemini' | 'openai' | 'anthropic' | 'stability' | 'replicate';
+type ProviderType =
+  | "gemini"
+  | "flux"
+  | "openai"
+  | "anthropic"
+  | "stability"
+  | "replicate";
 
 // Type for provider constructor
 type ProviderConstructor = new (config: ProviderConfig) => BaseProvider;
@@ -11,8 +18,12 @@ type ProviderConstructor = new (config: ProviderConfig) => BaseProvider;
  * Implements registry pattern for extensibility
  */
 export class ProviderFactory {
-  private static providers: Map<string, ProviderConstructor> = new Map([
-    ['gemini', GeminiProvider],
+  private static providers: Map<string, ProviderConstructor> = new Map<
+    string,
+    ProviderConstructor
+  >([
+    ["gemini", GeminiProvider],
+    ["flux", FluxProvider],
     // Future providers will be added here:
     // ['openai', OpenAIProvider],
     // ['anthropic', AnthropicProvider],
@@ -22,17 +33,20 @@ export class ProviderFactory {
    * Create provider instance by type
    * @throws Error if provider not implemented or invalid config
    */
-  static createProvider(
-    type: ProviderType,
-    config: ProviderConfig
-  ): BaseProvider {
+  static createProvider(type: ProviderType, model?: string): BaseProvider {
     const ProviderClass = this.providers.get(type);
 
     if (!ProviderClass) {
       throw new Error(`Provider '${type}' not implemented`);
     }
 
-    const provider = new ProviderClass(config);
+    const apiKey = this.getApiKeyForProvider(type);
+
+    const provider = new ProviderClass({
+      name: type,
+      apiKey: apiKey,
+      defaultModel: model,
+    });
 
     if (!provider.validateConfig()) {
       throw new Error(`Invalid configuration for provider '${type}'`);
@@ -45,13 +59,9 @@ export class ProviderFactory {
    * Get default provider from environment configuration
    */
   static getDefaultProvider(): BaseProvider {
-    const defaultType = (process.env.DEFAULT_PROVIDER || 'gemini') as ProviderType;
-    const apiKey = this.getApiKeyForProvider(defaultType);
-
-    return this.createProvider(defaultType, {
-      name: defaultType,
-      apiKey,
-    });
+    const defaultType = (process.env.DEFAULT_PROVIDER ||
+      "gemini") as ProviderType;
+    return this.createProvider(defaultType);
   }
 
   /**
@@ -60,17 +70,20 @@ export class ProviderFactory {
    */
   private static getApiKeyForProvider(type: ProviderType): string {
     const keyMap: Record<ProviderType, string> = {
-      gemini: process.env.GEMINI_API_KEY || '',
-      openai: process.env.OPENAI_API_KEY || '',
-      anthropic: process.env.ANTHROPIC_API_KEY || '',
-      stability: process.env.STABILITY_API_KEY || '',
-      replicate: process.env.REPLICATE_API_KEY || '',
+      gemini: process.env.GEMINI_API_KEY || "",
+      flux: process.env.REPLICATE_API_TOKEN || "",
+      openai: process.env.OPENAI_API_KEY || "",
+      anthropic: process.env.ANTHROPIC_API_KEY || "",
+      stability: process.env.STABILITY_API_KEY || "",
+      replicate: process.env.REPLICATE_API_TOKEN || "",
     };
 
     const apiKey = keyMap[type];
 
     if (!apiKey) {
-      throw new Error(`API key not found for provider '${type}'. Check your .env.local file.`);
+      throw new Error(
+        `API key not found for provider '${type}'. Check your .env.local file.`
+      );
     }
 
     return apiKey;
