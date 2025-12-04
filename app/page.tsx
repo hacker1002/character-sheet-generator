@@ -2,20 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import { CharacterForm } from './components/character-form';
-import { ResultDisplay } from './components/result-display';
+import { TabbedResultDisplay } from './components/tabbed-result-display';
 import { LoadingState } from './components/loading-state';
 import { CharacterSheetFormData } from '@/lib/validators';
-import { UploadResponse, CharacterSheetResponse } from '@/lib/types';
+import { UploadResponse } from '@/lib/types';
+import { useParallelGeneration } from '@/lib/hooks/use-parallel-generation';
+import { DEFAULT_MODELS } from '@/lib/models/model-config';
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<CharacterSheetResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    results,
+    isLoading: isGenerating,
+    error: generationError,
+    generateWithModels,
+  } = useParallelGeneration();
 
   const handleSubmit = async (data: CharacterSheetFormData) => {
     setIsLoading(true);
     setError(null);
-    setResult(null);
 
     try {
       // Step 1: Upload image
@@ -33,27 +40,14 @@ export default function HomePage() {
         throw new Error(uploadData.error || 'Image upload failed');
       }
 
-      // Step 2: Generate character sheet (pass base64 data)
-      const generateResponse = await fetch('/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Step 2: Generate with multiple models in parallel
+      await generateWithModels(
+        {
           systemPrompt: data.systemPrompt,
           imageData: uploadData.imageData,
-        }),
-      });
-
-      const generateData: CharacterSheetResponse =
-        await generateResponse.json();
-
-      if (!generateData.success) {
-        throw new Error(generateData.error || 'Character sheet generation failed');
-      }
-
-      // Success: display result
-      setResult(generateData);
+        },
+        DEFAULT_MODELS
+      );
     } catch (err: any) {
       console.error('Submission error:', err);
       setError(err.message || 'An unexpected error occurred');
@@ -62,9 +56,9 @@ export default function HomePage() {
     }
   };
 
-  // Auto-scroll to result when generation completes
+  // Auto-scroll to results when generation completes
   useEffect(() => {
-    if (result) {
+    if (results.length > 0) {
       setTimeout(() => {
         document.querySelector('.result-section')?.scrollIntoView({
           behavior: 'smooth',
@@ -72,7 +66,7 @@ export default function HomePage() {
         });
       }, 100);
     }
-  }, [result]);
+  }, [results]);
 
   return (
     <main className="page-container">
@@ -87,28 +81,20 @@ export default function HomePage() {
       <div className="main-grid">
         {/* Left Column - Form */}
         <section className="form-section">
-          <CharacterForm onSubmit={handleSubmit} isLoading={isLoading} />
-          {error && (
+          <CharacterForm
+            onSubmit={handleSubmit}
+            isLoading={isLoading || isGenerating}
+          />
+          {(error || generationError) && (
             <div className="error-message">
-              <strong>Error:</strong> {error}
+              <strong>Error:</strong> {error || generationError}
             </div>
           )}
         </section>
 
-        {/* Right Column - Result */}
+        {/* Right Column - Results with Tabs (Always visible) */}
         <section className="result-section">
-          {isLoading && <LoadingState />}
-          {result && result.imageData && (
-            <ResultDisplay
-              imageData={result.imageData}
-              metadata={result.metadata}
-            />
-          )}
-          {!isLoading && !result && (
-            <div className="result-placeholder">
-              <p>Generated character sheet will appear here</p>
-            </div>
-          )}
+          <TabbedResultDisplay models={DEFAULT_MODELS} results={results} />
         </section>
       </div>
     </main>

@@ -15,7 +15,13 @@ export async function POST(
 ): Promise<NextResponse<CharacterSheetResponse>> {
   try {
     const body: CharacterSheetRequest = await request.json();
-    const { systemPrompt, imageData, templateData, provider: requestedProvider } = body;
+    const {
+      systemPrompt,
+      imageData,
+      templateData,
+      provider: requestedProvider,
+      model: requestedModel,
+    } = body;
 
     // Validation: Required fields
     if (!systemPrompt || !imageData) {
@@ -35,13 +41,25 @@ export async function POST(
     const templateBuffer = templateData ? base64ToBuffer(templateData) : undefined;
 
     // Get provider instance (use requested or default)
-    const provider = requestedProvider
-      ? ProviderFactory.createProvider(requestedProvider as any, {
-          name: requestedProvider,
-          apiKey:
-            process.env[`${requestedProvider.toUpperCase()}_API_KEY`] || "",
-        })
-      : ProviderFactory.getDefaultProvider();
+    let provider;
+    if (requestedProvider) {
+      provider = ProviderFactory.createProvider(requestedProvider as any, {
+        name: requestedProvider,
+        apiKey:
+          process.env[`${requestedProvider.toUpperCase()}_API_KEY`] || "",
+        defaultModel: requestedModel,
+      });
+    } else if (requestedModel) {
+      // For default provider with custom model, recreate with model parameter
+      const defaultType = (process.env.DEFAULT_PROVIDER || 'gemini') as any;
+      provider = ProviderFactory.createProvider(defaultType, {
+        name: defaultType,
+        apiKey: process.env[`${defaultType.toUpperCase()}_API_KEY`] || "",
+        defaultModel: requestedModel,
+      });
+    } else {
+      provider = ProviderFactory.getDefaultProvider();
+    }
 
     // Build complete prompt for character sheet generation
     const fullPrompt = systemPrompt;

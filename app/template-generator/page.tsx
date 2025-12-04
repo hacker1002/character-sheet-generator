@@ -2,20 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import { TemplateForm } from '../components/template-form';
-import { ResultDisplay } from '../components/result-display';
+import { TabbedResultDisplay } from '../components/tabbed-result-display';
 import { LoadingState } from '../components/loading-state';
 import { TemplateGeneratorFormData } from '@/lib/validators';
-import { UploadResponse, CharacterSheetResponse } from '@/lib/types';
+import { UploadResponse } from '@/lib/types';
+import { useParallelGeneration } from '@/lib/hooks/use-parallel-generation';
+import { DEFAULT_MODELS } from '@/lib/models/model-config';
 
 export default function TemplateGeneratorPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<CharacterSheetResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    results,
+    isLoading: isGenerating,
+    error: generationError,
+    generateWithModels,
+  } = useParallelGeneration();
 
   const handleSubmit = async (data: TemplateGeneratorFormData) => {
     setIsLoading(true);
     setError(null);
-    setResult(null);
 
     try {
       // Step 1: Upload avatar image
@@ -48,30 +55,15 @@ export default function TemplateGeneratorPage() {
         throw new Error(templateData.error || 'Template upload failed');
       }
 
-      // Step 3: Generate character sheet with template
-      const generateResponse = await fetch('/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Step 3: Generate with multiple models in parallel
+      await generateWithModels(
+        {
           systemPrompt: data.systemPrompt,
           imageData: avatarData.imageData,
           templateData: templateData.imageData,
-        }),
-      });
-
-      const generateData: CharacterSheetResponse =
-        await generateResponse.json();
-
-      if (!generateData.success) {
-        throw new Error(
-          generateData.error || 'Template-based generation failed'
-        );
-      }
-
-      // Success: display result
-      setResult(generateData);
+        },
+        DEFAULT_MODELS
+      );
     } catch (err: any) {
       console.error('Submission error:', err);
       setError(err.message || 'An unexpected error occurred');
@@ -80,9 +72,9 @@ export default function TemplateGeneratorPage() {
     }
   };
 
-  // Auto-scroll to result when generation completes
+  // Auto-scroll to results when generation completes
   useEffect(() => {
-    if (result) {
+    if (results.length > 0) {
       setTimeout(() => {
         document.querySelector('.result-section')?.scrollIntoView({
           behavior: 'smooth',
@@ -90,7 +82,7 @@ export default function TemplateGeneratorPage() {
         });
       }, 100);
     }
-  }, [result]);
+  }, [results]);
 
   return (
     <main className="page-container">
@@ -105,28 +97,20 @@ export default function TemplateGeneratorPage() {
       <div className="main-grid">
         {/* Left Column - Form */}
         <section className="form-section">
-          <TemplateForm onSubmit={handleSubmit} isLoading={isLoading} />
-          {error && (
+          <TemplateForm
+            onSubmit={handleSubmit}
+            isLoading={isLoading || isGenerating}
+          />
+          {(error || generationError) && (
             <div className="error-message">
-              <strong>Error:</strong> {error}
+              <strong>Error:</strong> {error || generationError}
             </div>
           )}
         </section>
 
-        {/* Right Column - Result */}
+        {/* Right Column - Results with Tabs (Always visible) */}
         <section className="result-section">
-          {isLoading && <LoadingState />}
-          {result && result.imageData && (
-            <ResultDisplay
-              imageData={result.imageData}
-              metadata={result.metadata}
-            />
-          )}
-          {!isLoading && !result && (
-            <div className="result-placeholder">
-              <p>Generated result will appear here</p>
-            </div>
-          )}
+          <TabbedResultDisplay models={DEFAULT_MODELS} results={results} />
         </section>
       </div>
     </main>

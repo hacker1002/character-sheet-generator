@@ -6,6 +6,7 @@ export interface CharacterSheetRequest {
   imageData?: string; // Base64 image data (in-memory)
   templateData?: string; // Base64 template image data (for template-based generation)
   provider?: string; // Optional: override default provider
+  model?: string; // Optional: override default model
 }
 
 export interface CharacterSheetResponse {
@@ -17,6 +18,7 @@ export interface CharacterSheetResponse {
     provider: string;
     model: string;
     generatedAt: string;
+    generationTime?: number; // Duration in milliseconds
     dimensions?: { width: number; height: number };
   };
 }

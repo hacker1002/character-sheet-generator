@@ -6,6 +6,7 @@ interface ResultDisplayProps {
     provider: string;
     model: string;
     generatedAt: string;
+    generationTime?: number; // Duration in milliseconds
   };
 }
 
@@ -37,6 +38,12 @@ export function ResultDisplay({ imageData, metadata }: ResultDisplayProps) {
             <strong>Generated:</strong>{' '}
             {new Date(metadata.generatedAt).toLocaleString()}
           </p>
+          {metadata.generationTime && (
+            <p>
+              <strong>Duration:</strong>{' '}
+              {(metadata.generationTime / 1000).toFixed(2)}s
+            </p>
+          )}
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Loading state component with spinner and message
@@ -9,7 +9,7 @@ export function LoadingState() {
     <div className="loading-state">
       <div className="spinner"></div>
       <p>Generating your character sheet...</p>
-      <p className="loading-hint">This may take 5-15 seconds</p>
+      <p className="loading-hint">This may take 10-60 seconds</p>
     </div>
   );
 }

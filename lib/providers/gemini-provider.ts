@@ -63,11 +63,27 @@ export class GeminiProvider extends BaseProvider {
         contents[0].text = `${request.prompt}. The first image is the character/avatar to use. The second image is the template structure to follow. Generate the result based on the avatar following the exact layout and structure shown in the template.`;
       }
 
-      // Call Gemini API with new SDK format
-      const response = await this.client.models.generateContent({
-        model: this.config.defaultModel || 'gemini-2.5-flash-image',
+      const modelName = this.config.defaultModel || 'gemini-2.5-flash-image';
+
+      // Build request config based on model type
+      const requestConfig: any = {
+        model: modelName,
         contents,
-      });
+      };
+
+      // gemini-3-pro-image-preview requires special config
+      if (modelName === 'gemini-3-pro-image-preview') {
+        requestConfig.config = {
+          responseModalities: ['TEXT', 'IMAGE'],
+          imageConfig: {
+            aspectRatio: '1:1', // Default to square for character sheets
+            imageSize: '2K', // High resolution
+          },
+        };
+      }
+
+      // Call Gemini API with new SDK format
+      const response = await this.client.models.generateContent(requestConfig);
 
       // Extract image data from response
       const candidate = response.candidates?.[0];
