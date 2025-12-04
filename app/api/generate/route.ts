@@ -15,7 +15,7 @@ export async function POST(
 ): Promise<NextResponse<CharacterSheetResponse>> {
   try {
     const body: CharacterSheetRequest = await request.json();
-    const { systemPrompt, imageData, provider: requestedProvider } = body;
+    const { systemPrompt, imageData, templateData, provider: requestedProvider } = body;
 
     // Validation: Required fields
     if (!systemPrompt || !imageData) {
@@ -30,6 +30,9 @@ export async function POST(
 
     // Convert base64 to buffer (in-memory, Vercel-compatible)
     const imageBuffer = base64ToBuffer(imageData);
+
+    // Convert template base64 to buffer if provided
+    const templateBuffer = templateData ? base64ToBuffer(templateData) : undefined;
 
     // Get provider instance (use requested or default)
     const provider = requestedProvider
@@ -48,6 +51,8 @@ export async function POST(
       prompt: fullPrompt,
       imageBuffer,
       mimeType: "image/webp",
+      templateBuffer,
+      templateMimeType: templateBuffer ? "image/webp" : undefined,
     });
 
     // Check if generation succeeded

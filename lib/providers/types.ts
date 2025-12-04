@@ -4,6 +4,8 @@ export interface GenerationRequest {
   prompt: string;
   imageBuffer: Buffer;
   mimeType: string;
+  templateBuffer?: Buffer; // Optional template image for template-based generation
+  templateMimeType?: string; // MIME type for template image
 }
 
 export interface GenerationResult {

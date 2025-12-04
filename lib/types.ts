@@ -4,6 +4,7 @@ export interface CharacterSheetRequest {
   systemPrompt: string;
   uploadId?: string; // Legacy: for file-based uploads
   imageData?: string; // Base64 image data (in-memory)
+  templateData?: string; // Base64 template image data (for template-based generation)
   provider?: string; // Optional: override default provider
 }
 

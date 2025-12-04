@@ -35,11 +35,11 @@ export class GeminiProvider extends BaseProvider {
     const startTime = Date.now();
 
     try {
-      // Convert buffer to base64 for Gemini API
+      // Convert avatar buffer to base64 for Gemini API
       const imageBase64 = request.imageBuffer.toString('base64');
 
       // Prepare request with new API format - simplified structure
-      const contents = [
+      const contents: any[] = [
         { text: request.prompt },
         {
           inlineData: {
@@ -48,6 +48,20 @@ export class GeminiProvider extends BaseProvider {
           },
         },
       ];
+
+      // If template image is provided, add it to contents
+      if (request.templateBuffer && request.templateMimeType) {
+        const templateBase64 = request.templateBuffer.toString('base64');
+        contents.push({
+          inlineData: {
+            mimeType: request.templateMimeType,
+            data: templateBase64,
+          },
+        });
+
+        // Enhance prompt to reference template
+        contents[0].text = `${request.prompt}. The first image is the character/avatar to use. The second image is the template structure to follow. Generate the result based on the avatar following the exact layout and structure shown in the template.`;
+      }
 
       // Call Gemini API with new SDK format
       const response = await this.client.models.generateContent({
