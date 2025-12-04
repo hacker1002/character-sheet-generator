@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   templateGeneratorSchema,
   TemplateGeneratorFormData,
+  TEMPLATE_SYSTEM_PROMPT,
 } from "@/lib/validators";
 import { useState, useEffect } from "react";
 import { UseFormRegister, UseFormSetValue, FieldErrors } from "react-hook-form";
@@ -15,10 +16,10 @@ interface TemplateFormProps {
 }
 
 /**
- * Template-based generator form with 2 image upload fields:
+ * Template-based generator form with 2 image upload fields and system prompt:
  * 1. Avatar image upload (character reference)
  * 2. Template image upload (layout structure)
- * System prompt is fixed and hardcoded
+ * 3. System prompt textarea (customizable instructions)
  */
 export function TemplateForm({ onSubmit, isLoading }: TemplateFormProps) {
   const {
@@ -29,6 +30,9 @@ export function TemplateForm({ onSubmit, isLoading }: TemplateFormProps) {
   } = useForm<TemplateGeneratorFormData>({
     resolver: zodResolver(templateGeneratorSchema),
     mode: "onBlur", // Validate on blur for better UX
+    defaultValues: {
+      systemPrompt: TEMPLATE_SYSTEM_PROMPT,
+    },
   });
 
   return (
@@ -51,13 +55,32 @@ export function TemplateForm({ onSubmit, isLoading }: TemplateFormProps) {
         <TemplateImageUpload setValue={setValue} errors={errors} />
       </div>
 
+      {/* System Prompt */}
+      <div className="form-field">
+        <h3>3. System Prompt</h3>
+        <label htmlFor="systemPrompt">
+          Generation Instructions <span className="required">*</span>
+        </label>
+        <textarea
+          id="systemPrompt"
+          rows={6}
+          placeholder="Describe how to use the template..."
+          {...register("systemPrompt")}
+        />
+        {errors.systemPrompt && (
+          <span className="error">{errors.systemPrompt.message}</span>
+        )}
+        <span className="hint">
+          Customize the instructions for how AI should use the template. Default: "Generate result follow the input template image structure"
+        </span>
+      </div>
+
       {/* Info Box */}
       <div className="info-box">
         <strong>How it works:</strong>
         <p>
           The AI will analyze the template image structure and generate a
-          similar layout using your avatar image. The system will automatically
-          prompt: "Generate result follow the input template image structure"
+          similar layout using your avatar image based on your custom instructions.
         </p>
       </div>
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { TemplateForm } from '../components/template-form';
 import { ResultDisplay } from '../components/result-display';
 import { LoadingState } from '../components/loading-state';
-import { TemplateGeneratorFormData, TEMPLATE_SYSTEM_PROMPT } from '@/lib/validators';
+import { TemplateGeneratorFormData } from '@/lib/validators';
 import { UploadResponse, CharacterSheetResponse } from '@/lib/types';
 
 export default function TemplateGeneratorPage() {
@@ -55,7 +55,7 @@ export default function TemplateGeneratorPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          systemPrompt: TEMPLATE_SYSTEM_PROMPT,
+          systemPrompt: data.systemPrompt,
           imageData: avatarData.imageData,
           templateData: templateData.imageData,
         }),
