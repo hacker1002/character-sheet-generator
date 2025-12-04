@@ -1,10 +1,10 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI } from "@google/genai";
 import {
   BaseProvider,
   GenerationRequest,
   GenerationResult,
   ProviderConfig,
-} from './types';
+} from "./types";
 
 /**
  * Google Gemini provider implementation for character sheet generation
@@ -21,12 +21,12 @@ export class GeminiProvider extends BaseProvider {
   }
 
   get name(): string {
-    return 'gemini';
+    return "gemini";
   }
 
   validateConfig(): boolean {
     // Gemini API keys start with "AIza"
-    return !!this.config.apiKey && this.config.apiKey.startsWith('AIza');
+    return !!this.config.apiKey && this.config.apiKey.startsWith("AIza");
   }
 
   async generateCharacterSheet(
@@ -36,7 +36,7 @@ export class GeminiProvider extends BaseProvider {
 
     try {
       // Convert avatar buffer to base64 for Gemini API
-      const imageBase64 = request.imageBuffer.toString('base64');
+      const imageBase64 = request.imageBuffer.toString("base64");
 
       // Prepare request with new API format - simplified structure
       const contents: any[] = [
@@ -51,7 +51,7 @@ export class GeminiProvider extends BaseProvider {
 
       // If template image is provided, add it to contents
       if (request.templateBuffer && request.templateMimeType) {
-        const templateBase64 = request.templateBuffer.toString('base64');
+        const templateBase64 = request.templateBuffer.toString("base64");
         contents.push({
           inlineData: {
             mimeType: request.templateMimeType,
@@ -63,7 +63,7 @@ export class GeminiProvider extends BaseProvider {
         contents[0].text = `${request.prompt}. The first image is the character/avatar to use. The second image is the template structure to follow. Generate the result based on the avatar following the exact layout and structure shown in the template.`;
       }
 
-      const modelName = this.config.defaultModel || 'gemini-2.5-flash-image';
+      const modelName = this.config.defaultModel || "gemini-2.5-flash-image";
 
       // Build request config based on model type
       const requestConfig: any = {
@@ -72,12 +72,12 @@ export class GeminiProvider extends BaseProvider {
       };
 
       // gemini-3-pro-image-preview requires special config
-      if (modelName === 'gemini-3-pro-image-preview') {
+      if (modelName === "gemini-3-pro-image-preview") {
         requestConfig.config = {
-          responseModalities: ['TEXT', 'IMAGE'],
+          responseModalities: ["TEXT", "IMAGE"],
           imageConfig: {
-            aspectRatio: '1:1', // Default to square for character sheets
-            imageSize: '2K', // High resolution
+            aspectRatio: "3:2", // Default to square for character sheets
+            imageSize: "2K", // High resolution
           },
         };
       }
@@ -91,7 +91,7 @@ export class GeminiProvider extends BaseProvider {
       const imageData = parts.find((p: any) => p.inlineData)?.inlineData?.data;
 
       if (!imageData) {
-        throw new Error('No image data in Gemini response');
+        throw new Error("No image data in Gemini response");
       }
 
       const generationTime = Date.now() - startTime;
@@ -101,7 +101,7 @@ export class GeminiProvider extends BaseProvider {
         provider: this.name,
         images: [imageData],
         metadata: {
-          model: this.config.defaultModel || 'gemini-2.5-flash-image',
+          model: this.config.defaultModel || "gemini-2.5-flash-image",
           generatedAt: new Date().toISOString(),
           generationTime,
         },
@@ -116,11 +116,11 @@ export class GeminiProvider extends BaseProvider {
           provider: this.name,
           images: [],
           metadata: {
-            model: this.config.defaultModel || 'gemini-2.5-flash-image',
+            model: this.config.defaultModel || "gemini-2.5-flash-image",
             generatedAt: new Date().toISOString(),
             generationTime,
           },
-          error: 'Rate limit exceeded. Free tier: 1,500 requests/day.',
+          error: "Rate limit exceeded. Free tier: 1,500 requests/day.",
         };
       }
 
@@ -130,11 +130,11 @@ export class GeminiProvider extends BaseProvider {
           provider: this.name,
           images: [],
           metadata: {
-            model: this.config.defaultModel || 'gemini-2.5-flash-image',
+            model: this.config.defaultModel || "gemini-2.5-flash-image",
             generatedAt: new Date().toISOString(),
             generationTime,
           },
-          error: 'Invalid API key. Check GEMINI_API_KEY in .env.local',
+          error: "Invalid API key. Check GEMINI_API_KEY in .env.local",
         };
       }
 
@@ -144,11 +144,11 @@ export class GeminiProvider extends BaseProvider {
         provider: this.name,
         images: [],
         metadata: {
-          model: this.config.defaultModel || 'gemini-2.5-flash-image',
+          model: this.config.defaultModel || "gemini-2.5-flash-image",
           generatedAt: new Date().toISOString(),
           generationTime,
         },
-        error: `Generation failed: ${error.message || 'Unknown error'}`,
+        error: `Generation failed: ${error.message || "Unknown error"}`,
       };
     }
   }
