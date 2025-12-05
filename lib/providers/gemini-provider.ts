@@ -60,7 +60,7 @@ export class GeminiProvider extends BaseProvider {
         });
 
         // Enhance prompt to reference template
-        contents[0].text = `${request.prompt}. The first image is the character/avatar to use. The second image is the template structure to follow. Generate the result based on the avatar following the exact layout and structure shown in the template.`;
+        contents[0].text = request.prompt;
       }
 
       const modelName = this.config.defaultModel || "gemini-2.5-flash-image";

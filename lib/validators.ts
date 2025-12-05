@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // File validation constraints
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 /**
  * Simplified character sheet form schema with only 2 fields
@@ -12,21 +12,21 @@ export const characterSheetSchema = z.object({
   // Avatar image upload (required, max 15MB, JPG/PNG/WebP only)
   // Note: Validated as File (component extracts from FileList before validation)
   avatar: z
-    .instanceof(File, { message: 'Avatar image is required' })
+    .instanceof(File, { message: "Avatar image is required" })
     .refine(
       (file) => file.size > 0 && file.size <= MAX_FILE_SIZE,
-      'Image must be less than 15MB'
+      "Image must be less than 15MB"
     )
     .refine(
       (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-      'Only JPG, PNG, and WebP formats are supported'
+      "Only JPG, PNG, and WebP formats are supported"
     ),
 
   // System prompt textarea (10-2000 characters)
   systemPrompt: z
     .string()
-    .min(10, 'System prompt must be at least 10 characters')
-    .max(2000, 'System prompt must be less than 2000 characters'),
+    .min(10, "System prompt must be at least 10 characters")
+    .max(2000, "System prompt must be less than 2000 characters"),
 });
 
 // TypeScript type inference from Zod schema
@@ -44,33 +44,33 @@ export const DEFAULT_SYSTEM_PROMPT = `Character sheet of a cute Vietnamese kinde
 export const templateGeneratorSchema = z.object({
   // Avatar image upload (required, max 15MB, JPG/PNG/WebP only)
   avatar: z
-    .instanceof(File, { message: 'Avatar image is required' })
+    .instanceof(File, { message: "Avatar image is required" })
     .refine(
       (file) => file.size > 0 && file.size <= MAX_FILE_SIZE,
-      'Image must be less than 15MB'
+      "Image must be less than 15MB"
     )
     .refine(
       (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-      'Only JPG, PNG, and WebP formats are supported'
+      "Only JPG, PNG, and WebP formats are supported"
     ),
 
   // Template image upload (required, max 15MB, JPG/PNG/WebP only)
   template: z
-    .instanceof(File, { message: 'Template image is required' })
+    .instanceof(File, { message: "Template image is required" })
     .refine(
       (file) => file.size > 0 && file.size <= MAX_FILE_SIZE,
-      'Template must be less than 15MB'
+      "Template must be less than 15MB"
     )
     .refine(
       (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-      'Only JPG, PNG, and WebP formats are supported'
+      "Only JPG, PNG, and WebP formats are supported"
     ),
 
   // System prompt textarea (10-2000 characters)
   systemPrompt: z
     .string()
-    .min(10, 'System prompt must be at least 10 characters')
-    .max(2000, 'System prompt must be less than 2000 characters'),
+    .min(10, "System prompt must be at least 10 characters")
+    .max(2000, "System prompt must be less than 2000 characters"),
 });
 
 // TypeScript type inference from Zod schema
@@ -79,4 +79,5 @@ export type TemplateGeneratorFormData = z.infer<typeof templateGeneratorSchema>;
 /**
  * Default system prompt for template-based generation
  */
-export const TEMPLATE_SYSTEM_PROMPT = 'Generate result follow the input template image structure';
+export const TEMPLATE_SYSTEM_PROMPT =
+  "The first image is the character/avatar to use. The second image is the template structure to follow. Generate the result based on the avatar following the exact layout and structure shown in the template.";

@@ -71,7 +71,8 @@ export function TemplateForm({ onSubmit, isLoading }: TemplateFormProps) {
           <span className="error">{errors.systemPrompt.message}</span>
         )}
         <span className="hint">
-          Customize the instructions for how AI should use the template. Default: "Generate result follow the input template image structure"
+          Customize the instructions for how AI should use the template.
+          Default: "Generate result follow the input template image structure"
         </span>
       </div>
 
@@ -80,7 +81,8 @@ export function TemplateForm({ onSubmit, isLoading }: TemplateFormProps) {
         <strong>How it works:</strong>
         <p>
           The AI will analyze the template image structure and generate a
-          similar layout using your avatar image based on your custom instructions.
+          similar layout using your avatar image based on your custom
+          instructions.
         </p>
       </div>
 
