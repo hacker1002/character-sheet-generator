@@ -33,13 +33,13 @@ export const DEFAULT_MODELS: ModelConfig[] = [
     model: "gemini-3-pro-image-preview",
     preview: true,
   },
-  {
-    id: "flux-schnell",
-    label: "Flux Schnell",
-    provider: "flux",
-    model: "black-forest-labs/flux-schnell",
-    preview: false,
-  },
+  // {
+  //   id: "flux-schnell",
+  //   label: "Flux Schnell",
+  //   provider: "flux",
+  //   model: "black-forest-labs/flux-schnell",
+  //   preview: false,
+  // },
 ];
 
 /**
