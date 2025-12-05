@@ -1,13 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { TemplateForm } from '../components/template-form';
-import { TabbedResultDisplay } from '../components/tabbed-result-display';
-import { LoadingState } from '../components/loading-state';
-import { TemplateGeneratorFormData } from '@/lib/validators';
-import { UploadResponse } from '@/lib/types';
-import { useParallelGeneration } from '@/lib/hooks/use-parallel-generation';
-import { DEFAULT_MODELS } from '@/lib/models/model-config';
+import { useState, useEffect } from "react";
+import { TemplateForm } from "../components/template-form";
+import { TabbedResultDisplay } from "../components/tabbed-result-display";
+import { LoadingState } from "../components/loading-state";
+import { TemplateGeneratorFormData } from "@/lib/validators";
+import { UploadResponse } from "@/lib/types";
+import { useParallelGeneration } from "@/lib/hooks/use-parallel-generation";
+import { DEFAULT_MODELS } from "@/lib/models/model-config";
+import { compressImage } from "@/lib/image-compression";
 
 export default function TemplateGeneratorPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,32 +28,36 @@ export default function TemplateGeneratorPage() {
     try {
       // Step 1: Upload avatar image
       const avatarFormData = new FormData();
-      avatarFormData.append('image', data.avatar);
 
-      const avatarUploadResponse = await fetch('/api/upload', {
-        method: 'POST',
+      const avatarCompressed = await compressImage(data.avatar);
+      avatarFormData.append("image", avatarCompressed);
+
+      const avatarUploadResponse = await fetch("/api/upload", {
+        method: "POST",
         body: avatarFormData,
       });
 
       const avatarData: UploadResponse = await avatarUploadResponse.json();
 
       if (!avatarData.success || !avatarData.imageData) {
-        throw new Error(avatarData.error || 'Avatar upload failed');
+        throw new Error(avatarData.error || "Avatar upload failed");
       }
 
       // Step 2: Upload template image
       const templateFormData = new FormData();
-      templateFormData.append('image', data.template);
 
-      const templateUploadResponse = await fetch('/api/upload', {
-        method: 'POST',
+      const templateCompressed = await compressImage(data.template);
+      templateFormData.append("image", templateCompressed);
+
+      const templateUploadResponse = await fetch("/api/upload", {
+        method: "POST",
         body: templateFormData,
       });
 
       const templateData: UploadResponse = await templateUploadResponse.json();
 
       if (!templateData.success || !templateData.imageData) {
-        throw new Error(templateData.error || 'Template upload failed');
+        throw new Error(templateData.error || "Template upload failed");
       }
 
       // Step 3: Generate with multiple models in parallel
@@ -65,8 +70,8 @@ export default function TemplateGeneratorPage() {
         DEFAULT_MODELS
       );
     } catch (err: any) {
-      console.error('Submission error:', err);
-      setError(err.message || 'An unexpected error occurred');
+      console.error("Submission error:", err);
+      setError(err.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -76,9 +81,9 @@ export default function TemplateGeneratorPage() {
   useEffect(() => {
     if (results.length > 0) {
       setTimeout(() => {
-        document.querySelector('.result-section')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
+        document.querySelector(".result-section")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
       }, 100);
     }
@@ -90,7 +95,8 @@ export default function TemplateGeneratorPage() {
       <header className="page-header">
         <h1>Template-Based Generator</h1>
         <p className="subtitle">
-          Upload an avatar and a template image - AI will generate results following the template structure
+          Upload an avatar and a template image - AI will generate results
+          following the template structure
         </p>
       </header>
 
